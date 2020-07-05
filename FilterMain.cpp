@@ -90,7 +90,6 @@ readFilter(string filename)
     exit(-1);
   }
 }
-//*****************
 
 double
 applyFilter(class Filter *filter, cs1300bmp *input, cs1300bmp *output)
@@ -109,6 +108,7 @@ applyFilter(class Filter *filter, cs1300bmp *input, cs1300bmp *output)
   int height = input->height -1;
   int size = filter->getSize();
   char divisor = filter->getDivisor();
+  int *data = filter->data;
 
   // flip row and col to consider spatial locality *****
   for(row = 1; row < height; row++) 
@@ -124,17 +124,19 @@ applyFilter(class Filter *filter, cs1300bmp *input, cs1300bmp *output)
       {
         for (j = 0; j < size; j++) 
         {
+          // change the way we get filter data, with data public we don't have to call get(function) *****
+          // we can access the data array as a pointer to the filter.cpp file *****
           rcoll = rcoll
           + (input -> color[row + i - 1][col + j - 1].r
-          * filter -> get(i, j) );
+          * data[i*size+j]);
 
           gcoll = gcoll
           + (input -> color[row + i - 1][col + j - 1].g
-          * filter -> get(i, j) );
+          * data[i*size+j]);
 
           bcoll = bcoll
           + (input -> color[row + i - 1][col + j - 1].b
-          * filter -> get(i, j) );
+          * data[i*size+j]);
         }
       }
 

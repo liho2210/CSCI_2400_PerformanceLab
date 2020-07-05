@@ -5,6 +5,7 @@ Filter::Filter(int _dim)
 {
   divisor = 1;
   dim = _dim;
+  // array of integers that's dim x dim in size *****
   data = new int[dim * dim];
 }
 

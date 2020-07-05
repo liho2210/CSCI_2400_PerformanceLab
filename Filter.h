@@ -7,7 +7,6 @@ using namespace std;
 class Filter {
   int divisor;
   int dim;
-  int *data;
 
 public:
   Filter(int _dim);
@@ -19,6 +18,8 @@ public:
 
   int getSize();
   void info();
+  // make data public *****
+  int *data;
 };
 
 #endif
