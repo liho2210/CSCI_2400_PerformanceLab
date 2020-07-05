@@ -90,7 +90,7 @@ readFilter(string filename)
     exit(-1);
   }
 }
-
+//*****************
 
 double
 applyFilter(class Filter *filter, cs1300bmp *input, cs1300bmp *output)
@@ -104,7 +104,7 @@ applyFilter(class Filter *filter, cs1300bmp *input, cs1300bmp *output)
   // call getSize and getDivisor functions outside of loops *****
   output -> width = input -> width;
   output -> height = input -> height;
-  int col, row, i, j;
+  int col, row, i, j, rcoll, gcoll, bcoll;
   int width = input->width - 1;
   int height = input->height -1;
   int size = filter->getSize();
@@ -115,64 +115,62 @@ applyFilter(class Filter *filter, cs1300bmp *input, cs1300bmp *output)
   {
     for(col = 1; col < width; col++) 
     {
-      // account for 2d array changes *****
-      output -> color[row][col].r = 0;
-      output -> color[row][col].g = 0;
-      output -> color[row][col].b = 0;
+      // use separate containers to maintain values instead of calling output-> each time *****
+      rcoll = 0;
+      gcoll = 0;
+      bcoll = 0;
 
       for (i = 0; i < size; i++) 
       {
         for (j = 0; j < size; j++) 
-        {	
-          output -> color[row][col].r
-            = output -> color[row][col].r
-            + (input -> color[row + i - 1][col + j - 1].r
-            * filter -> get(i, j) );
+        {
+          rcoll = rcoll
+          + (input -> color[row + i - 1][col + j - 1].r
+          * filter -> get(i, j) );
 
-        output -> color[row][col].g
-            = output -> color[row][col].g
-            + (input -> color[row + i - 1][col + j - 1].g
-            * filter -> get(i, j) );
+          gcoll = gcoll
+          + (input -> color[row + i - 1][col + j - 1].g
+          * filter -> get(i, j) );
 
-        output -> color[row][col].b
-            = output -> color[row][col].b
-            + (input -> color[row + i - 1][col + j - 1].b
-            * filter -> get(i, j) );
+          bcoll = bcoll
+          + (input -> color[row + i - 1][col + j - 1].b
+          * filter -> get(i, j) );
         }
       }
-      
-      output -> color[row][col].r = 	
-        output -> color[row][col].r / divisor;
-      output -> color[row][col].g = 	
-        output -> color[row][col].g / divisor;
-      output -> color[row][col].b = 	
-        output -> color[row][col].b / divisor;
 
-      if ( output -> color[row][col].r  < 0 ) 
+      rcoll = rcoll / divisor;
+      gcoll = gcoll / divisor;
+      bcoll = bcoll / divisor;
+
+      if ( rcoll  < 0 ) 
       {
-        output -> color[row][col].r = 0;
+        rcoll = 0;
       }
-      if ( output -> color[row][col].g  < 0 ) 
+      if ( gcoll  < 0 ) 
       {
-        output -> color[row][col].g = 0;
+        gcoll = 0;
       }
-      if ( output -> color[row][col].b  < 0 ) 
+      if ( bcoll  < 0 ) 
       {
-        output -> color[row][col].b = 0;
+        bcoll = 0;
       }
 
-      if ( output -> color[row][col].r  > 255 ) 
+      if ( rcoll > 255 ) 
       { 
-        output -> color[row][col].r = 255;
+        rcoll = 255;
       }
-      if ( output -> color[row][col].g  > 255 ) 
+      if ( gcoll > 255 ) 
       { 
-        output -> color[row][col].g = 255;
+        gcoll = 255;
       }
-      if ( output -> color[row][col].b  > 255 ) 
+      if ( bcoll > 255 ) 
       { 
-        output -> color[row][col].b = 255;
+        bcoll = 255;
       }
+
+      output -> color[row][col].r = rcoll;
+      output -> color[row][col].g = gcoll;
+      output -> color[row][col].b = bcoll;
     }
   }
 
