@@ -15,6 +15,13 @@
 #define COLOR_BLUE 2
 #define MAX_COLORS 3
 
+//separate struct to reduce size of array *****
+struct rgb {
+  int r;
+  int g;
+  int b;
+};
+
 struct cs1300bmp {
   //
   // Actual width used by this image
@@ -27,7 +34,8 @@ struct cs1300bmp {
   //
   // R/G/B fields
   // 
-  int color[MAX_COLORS][MAX_DIM][MAX_DIM];
+  // 2d array instead of 3d *****
+  rgb color[MAX_DIM][MAX_DIM];
 };
 
 //

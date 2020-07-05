@@ -100,78 +100,35 @@ applyFilter(class Filter *filter, cs1300bmp *input, cs1300bmp *output)
 
   cycStart = rdtscll();
 
-  // declare variables outside of loops *****
-  // call getSize and getDivisor functions outside of loops *****
   output -> width = input -> width;
   output -> height = input -> height;
-  int col, row, i, j;
-  int width = input->width - 1;
-  int height = input->height -1;
-  int size = filter->getSize();
-  char divisor = filter->getDivisor();
 
-  // flip row and col to consider spatial locality *****
-  for(row = 1; row < height; row++) 
-  {
-    for(col = 1; col < width; col++) 
-    {
-      // account for 2d array changes *****
-      output -> color[row][col].r = 0;
-      output -> color[row][col].g = 0;
-      output -> color[row][col].b = 0;
 
-      for (i = 0; i < size; i++) 
-      {
-        for (j = 0; j < size; j++) 
-        {	
-          output -> color[row][col].r
-            = output -> color[row][col].r
-            + (input -> color[row + i - 1][col + j - 1].r
-            * filter -> get(i, j) );
+  for(int col = 1; col < (input -> width) - 1; col = col + 1) {
+    for(int row = 1; row < (input -> height) - 1 ; row = row + 1) {
+      for(int plane = 0; plane < 3; plane++) {
 
-        output -> color[row][col].g
-            = output -> color[row][col].g
-            + (input -> color[row + i - 1][col + j - 1].g
-            * filter -> get(i, j) );
+	output -> color[plane][row][col] = 0;
 
-        output -> color[row][col].b
-            = output -> color[row][col].b
-            + (input -> color[row + i - 1][col + j - 1].b
-            * filter -> get(i, j) );
-        }
-      }
-      
-      output -> color[row][col].r = 	
-        output -> color[row][col].r / divisor;
-      output -> color[row][col].g = 	
-        output -> color[row][col].g / divisor;
-      output -> color[row][col].b = 	
-        output -> color[row][col].b / divisor;
+	for (int j = 0; j < filter -> getSize(); j++) {
+	  for (int i = 0; i < filter -> getSize(); i++) {	
+	    output -> color[plane][row][col]
+	      = output -> color[plane][row][col]
+	      + (input -> color[plane][row + i - 1][col + j - 1] 
+		 * filter -> get(i, j) );
+	  }
+	}
+	
+	output -> color[plane][row][col] = 	
+	  output -> color[plane][row][col] / filter -> getDivisor();
 
-      if ( output -> color[row][col].r  < 0 ) 
-      {
-        output -> color[row][col].r = 0;
-      }
-      if ( output -> color[row][col].g  < 0 ) 
-      {
-        output -> color[row][col].g = 0;
-      }
-      if ( output -> color[row][col].b  < 0 ) 
-      {
-        output -> color[row][col].b = 0;
-      }
+	if ( output -> color[plane][row][col]  < 0 ) {
+	  output -> color[plane][row][col] = 0;
+	}
 
-      if ( output -> color[row][col].r  > 255 ) 
-      { 
-        output -> color[row][col].r = 255;
-      }
-      if ( output -> color[row][col].g  > 255 ) 
-      { 
-        output -> color[row][col].g = 255;
-      }
-      if ( output -> color[row][col].b  > 255 ) 
-      { 
-        output -> color[row][col].b = 255;
+	if ( output -> color[plane][row][col]  > 255 ) { 
+	  output -> color[plane][row][col] = 255;
+	}
       }
     }
   }
